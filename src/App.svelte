@@ -8,7 +8,7 @@
   }
 
   let score: number = 0;
-  let seconds = 3;
+  let seconds: number = 30;
   const [words, dispatch] = reducible(initialWords, reducer);
 
   interface Action {
