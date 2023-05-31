@@ -2,7 +2,11 @@
   import { onDestroy } from 'svelte';
   import { reducible } from './store';
 
-  const initialWords: string[] = ['a', 'b', 'c', 'd', 'e'];
+  const initialWords: string[] = ['', '', '', '', ''];
+  for (let i = 0; i < initialWords.length; i++) {
+    initialWords[i] = getRandomCharacter();
+  }
+
   let score: number = 0;
   let seconds = 60;
   const [words, dispatch] = reducible(initialWords, reducer);
@@ -40,17 +44,30 @@
     return alphabet[randomIndex];
   }
 
-  function countdown() {
+  function countdown(interval: number) {
     if (seconds > 0) {
       seconds--;
     } else {
-      alert('time is up!');
-      clearInterval(countdownInterval);
+      alert(`time is up! Your total score is ${score}`);
+      clearInterval(interval);
       return;
     }
   }
 
-  const countdownInterval = setInterval(countdown, 1000);
+  function restart() {
+    clearInterval(countdownInterval);
+    seconds = 60;
+    score = 0;
+    const newCountdownInterval = setInterval(
+      () => countdown(newCountdownInterval),
+      1000
+    );
+  }
+
+  const countdownInterval = setInterval(
+    () => countdown(countdownInterval),
+    1000
+  );
 
   window.addEventListener('keydown', handleKeyDown);
 
@@ -62,6 +79,7 @@
 
 <main>
   <div class="header">
+    <button class="restartBtn" on:click={restart}>Restart</button>
     <div class="time">{seconds}</div>
     <div class="score">score: {score}</div>
   </div>
@@ -98,5 +116,17 @@
 
   .word {
     font-size: 90px;
+  }
+
+  .restartBtn {
+    border-radius: 10px;
+    background-color: #a4a4a3;
+    outline: none;
+    border: 0;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgb(0, 13, 255);
+    }
   }
 </style>
