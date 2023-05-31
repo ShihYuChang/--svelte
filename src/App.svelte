@@ -1,59 +1,62 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { reducible } from './store';
-    
-interface Action {
-  type: string,
-  payload: number
-};
 
-  function reducer(words: number, action: Action){
-    switch(action.type){  
-      case 'increment':
-        return words + action.payload;
+  const initialWords: string[] = ['a', 'b', 'c', 'd', 'e'];
+  const [words, dispatch] = reducible(initialWords, reducer);
+
+  interface Action {
+    type: string;
+    payload: string;
+  }
+
+  function reducer(words: string[], action: Action) {
+    switch (action.type) {
+      case 'PRESS_KEY':
+        const wordIndex = words.indexOf(action.payload);
+        words.splice(wordIndex, 1, getRandomCharacter());
+        return words;
       default:
-        return words
+        return words;
     }
-  };
+  }
 
-  const [words, dispatch] = reducible(0, reducer);
-
-  function handleKeyDown(e: KeyboardEvent){
-    switch(e.key){
-      case 'a':
-        dispatch({type: 'increment', payload: 1})
+  function handleKeyDown(e: KeyboardEvent) {
+    switch (e.key) {
       default:
+        dispatch({ type: 'PRESS_KEY', payload: e.key });
         break;
     }
   }
 
+  function getRandomCharacter(): string {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    const randomIndex = Math.floor(Math.random() * alphabet.length);
+    return alphabet[randomIndex];
+  }
 
-  window.addEventListener('keydown', handleKeyDown)
-  // const words: string[] = ['A', 'B', 'C', 'D', 'E'];
-
-  </script>
+  window.addEventListener('keydown', handleKeyDown);
+  onDestroy(() => window.removeEventListener('keydown', handleKeyDown));
+</script>
 
 <main>
   <div class="wrapper">
-    <div class="word">{$words}</div>
-  </div>
-  <button on:click={()=> dispatch({type: 'increment', payload: 5})}>Add</button>
-  <!-- <div class="wrapper">
-    {#each words as word}
-      <div class="word">{word}</div>
+    {#each $words as word}
+      <div class="word">{word.toUpperCase()}</div>
     {/each}
-  </div> -->
+  </div>
 </main>
 
 <style>
-.wrapper{
-  width: 80vw;
-  height: 300px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .wrapper {
+    width: 80vw;
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.word{
-  font-size: 90px;
-}
+  .word {
+    font-size: 90px;
+  }
 </style>
