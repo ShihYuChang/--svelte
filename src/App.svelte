@@ -2,13 +2,13 @@
   import { onDestroy } from 'svelte';
   import { reducible } from './store';
 
-  const initialWords: string[] = ['', '', '', '', ''];
+  const initialWords: string[] = Array(5).fill('');
   for (let i = 0; i < initialWords.length; i++) {
     initialWords[i] = getRandomCharacter();
   }
 
   let score: number = 0;
-  let seconds = 60;
+  let seconds = 3;
   const [words, dispatch] = reducible(initialWords, reducer);
 
   interface Action {
@@ -20,7 +20,7 @@
     switch (action.type) {
       case 'PRESS_KEY':
         const wordIndex: number = words.indexOf(action.payload);
-        if (wordIndex !== -1) {
+        if (wordIndex !== -1 && seconds > 0) {
           score++;
           words.splice(wordIndex, 1, getRandomCharacter());
         }
@@ -84,9 +84,14 @@
     <div class="score">score: {score}</div>
   </div>
   <div class="wordWrapper">
-    {#each $words as word}
-      <div class="word">{word.toUpperCase()}</div>
-    {/each}
+    {#if seconds > 0}
+      {#each $words as word}
+        <div class="word">{word.toUpperCase()}</div>
+      {/each}
+    {/if}
+    {#if seconds === 0}
+      <div class="word">Your Score: {score}</div>
+    {/if}
   </div>
 </main>
 
