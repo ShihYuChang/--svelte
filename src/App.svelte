@@ -85,7 +85,7 @@
   </div>
   <div class="wordWrapper">
     {#if seconds > 0}
-      {#each $words as word}
+      {#each $words as word, index}
         <div class="word">{word.toUpperCase()}</div>
       {/each}
     {/if}
@@ -120,6 +120,7 @@
   }
 
   .word {
+    width: 100%;
     font-size: 90px;
   }
 
